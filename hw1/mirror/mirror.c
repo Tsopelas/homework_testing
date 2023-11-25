@@ -9,14 +9,14 @@ int is_prime(unsigned long long n) {
     if (n < 2) {
         return 0;
     }
-    if (n < 4) {
+    if (n < 4){
         return 1;
     }
-    if (n % 2 == 0 || n % 3 == 0) {
+    if (n % 2 == 0 || n % 3 == 0){
         return 0;
     }
-    for (unsigned long long i = 5; i * i <= n; i += 6) {
-        if (n % i == 0 || n % (i + 2) == 0) {
+    for (unsigned long long i = 5; i * i <= n; i += 6){
+        if (n % i == 0 || n % (i + 2) == 0){
             return 0;
         }
     }
@@ -35,19 +35,27 @@ unsigned long long mirror(unsigned long long n){
   
 }
 
-int isnot_palindromic(unsigned long long n) {
-    unsigned long long reversed = mirror (n);
-    return n != reversed;
-}
 
-int check (long long n) {
-    if (is_prime(n)){
-        if (isnot_palindromic(n)){
-            return 1;
+int check(unsigned long long n, unsigned long long i) {
+    unsigned long long reversed = mirror(n);
+    
+    // Check if n and reversed are both primes
+    if (reversed != n) {
+        // Check if n is not equal to its reversed form
+        if (is_prime(i) == 1) {
+            unsigned long long rev_root = i * i;
+            if (rev_root == reversed * reversed) {
+                if(is_prime(rev_root)) {
+                    return 1;
+                }
+            }
         }
     }
-    return 0;
+    
+    return 0;  // Not a palindromic prime square
 }
+
+
 
 int main(int argc, char **argv) {
     if (argc != 3) {
@@ -67,9 +75,8 @@ int main(int argc, char **argv) {
     unsigned long long sum = 0;
     for (unsigned long long i = begin; i * i <= high; i += 2) {
         unsigned long long sqr = i * i;
-        printf("i: %lld, sqr: %lld, isnot_palindromic: %d, is_prime: %d, check: %d\n",
-           i, sqr, isnot_palindromic(sqr), is_prime(sqr), check(sqr));
-        if (check(sqr)) {
+        printf("Checking square: %llu\n", sqr);
+        if (check(sqr,i) == 1) {
             sum += sqr;
         }
     }
