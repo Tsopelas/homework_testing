@@ -26,65 +26,45 @@ void evaluateCompositions(int n, int i, int maxN) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
+    if (argc < 3) {
         printf("Need a number as a parameter.\n");
         return 1;
     }
 
-    char *strNum = argv[1];
+    unsigned long long low = atoll(argv[1]);
+    unsigned long long high = atoll(argv[2]);
 
-    for (int i = 0; strNum[i] != '\0'; i++) {
-        if (!isdigit((unsigned char)strNum[i])) {
-            printf("Input parameter must be a whole number. No decimals, no negatives.\n");
-            return 1;
-        }
-    }
-
-    int num = atoi(strNum);
-    double sqrtResult = sqrt(num);
-    printf("Checking if %s with square root %.1lf is an S-Number\n", strNum, sqrtResult);
-    bool isSNumber = false;
-    int N = strlen(strNum);
-
-    if (sqrtResult == (int)sqrtResult) {
-        resultComposition[0] = (int)sqrtResult;
-        isSNumber = true;
-    } else {
-        for (int i = 0; i < N; i++) {
+    long long sum = 0;
+    for (unsigned long long n = low; n <= high; n++) {
+        double sqrtResult = sqrt(n);
+        bool isSNumber = false;
+        int N = strlen(strNum);
+        if (sqrtResult == (int)sqrtResult) {
+            resultComposition[0] = (int)sqrtResult;
+            isSNumber = true;
+        } else {
+            for (int i = 0; i < N; i++) {
             arr[i] = 0;
+            }
+            evaluateCompositions(N, 0, N);
+            for (int j = 0; j < N; j++) {
+                int idx = 0;
+                int total = 0;
+                for (int i = 0; i < arr[j]; i++) {
+                    compositions[i] = atoi(strNum + idx);
+                    total += compositions[i];
+                    idx += arr[j];
+                }
+                if (total == sqrtResult) {
+                    isSNumber = true;
+                    break;
+                }
+            }
         }
-
-        evaluateCompositions(N, 0, N);
-
-        for (int j = 0; j < N; j++) {
-            int idx = 0;
-            int total = 0;
-
-            for (int i = 0; i < arr[j]; i++) {
-                compositions[i] = atoi(strNum + idx);
-                total += compositions[i];
-                idx += arr[j];
-            }
-
-            if (total == sqrtResult) {
-                isSNumber = true;
-                break;
-            }
+        if (isSNumber) {
+            sum += n;
         }
     }
-
-    if (isSNumber) {
-        for (int i = 0; i < N; i++) {
-            printf("%d", resultComposition[i]);
-            if (resultComposition[i + 1] != 0) {
-                printf(" + ");
-            }
-        }
-        printf("= %.1lf\n", sqrtResult);
-        printf("%s is an S-Number\n", strNum);
-    } else {
-        printf("%s doesn't look like an S-Number\n", strNum);
-    }
-
+    printf("%lld\n",sum);
     return 0;
 }
