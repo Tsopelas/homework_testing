@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#define max_number 1000000000000000
+#define min_number 1
 #pragma GCC optimize ("O3")
-#define MAX_NUMBER 1000000000000
-#define MIN_NUMBER 1
 
+<<<<<<< HEAD
 int count(unsigned long long n) {
     int count = 0;
     long long mod;
@@ -54,6 +55,40 @@ unsigned long long digit_sum(unsigned long long n){
 int check (unsigned long long n) {
     unsigned long long number = digit_sum(n);
     if (number * number == n) {
+=======
+int count_digits(long long n){
+    int count;
+    do {
+        n /= 10;
+        ++count;
+    } 
+    while (n != 0);
+    return count;
+}
+
+long long digit_separation(long long n,long long percentage,int count) {
+    long long mod;
+    long long sum_d;
+    long long number = n;
+
+    long long tempNumber = number;
+
+    while (tempNumber > 0) {
+        mod = tempNumber % 10;
+        tempNumber /= 10; 
+        if ((mod + tempNumber) ^ 2 == n){
+            sum_d += n;
+        }
+    }
+    return sum_d;
+}
+
+int check(long long n){
+    long long num = n;
+    long long perc = 10;
+    
+    if (digit_separation(num,perc,count_digits(n))^2 == n) {
+>>>>>>> bc80f9a (upd)
         return 1;
     }
     return 0;
@@ -61,20 +96,19 @@ int check (unsigned long long n) {
 
 int main(int argc, char **argv) {
     if (argc != 3) {
-        printf("ERROR: MORE/LESS THAN 2 INPUTS\n");
         return 1;
     }
     unsigned long long low = atoll(argv[1]);
     unsigned long long high = atoll(argv[2]);
-    if (low > high || low < MIN_NUMBER || high > MAX_NUMBER) {
-        printf("INPUTS NEED TO MATCH THE LIMITS\n");
+    if (low > high || low < min_number || high > max_number){
+        printf("error\n");
         return 1;
     }
     unsigned long long begin = sqrt(low);
     if (begin * begin < low) {
-        ++begin;
+        ++begin; 
     }
-    long long sum = 0;
+    unsigned long long sum = 0;
     for (unsigned long long i = begin; i * i <= high; i += 2) {
         register unsigned long long sqr = i * i;
         if (check(sqr)) {
