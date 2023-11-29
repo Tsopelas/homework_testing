@@ -1,120 +1,101 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <math.h>
-#define max_number 1000000000000000
-#define min_number 1
-#pragma GCC optimize ("O3")
 
-<<<<<<< HEAD
-int count(unsigned long long n) {
-    int count = 0;
-    long long mod;
-    while (n > 0) {
-        mod = n % 10;
-        count++;
-        n /= 10;
-    }
-    return count;
-}
+#define MAX_NUMBER 1000000000000
+#define MIN_NUMBER 1
+#define MAX_DIGITS 100
 
-unsigned long long digit_sum(unsigned long long n){
-    long long digit_sum = 0;
-    long long mod;
-    long long num = n;
-    int digit_count = count(n);
-    // CASE 0
-    while (num > 0) {
-        mod = num % 10;
-        digit_sum += mod;
-        num /= 10;
-    }
-    if (digit_sum * digit_sum == n) {
-        return digit_sum;
-    }
-    digit_sum = 0;
-    // CASE 1
-    for (int i = digit_count-1; i >= 1 ; i--) {
-        long long number = n;
-        long long mod = 0;
-        long long sum = 0;
-        int divisor = pow(10,i);
-        mod = number % divisor;
-        sum += mod;
-        number /= divisor;
-        sum += number ;
-        if (sum * sum == n) {
-            return sum;
+long long arr[MAX_DIGITS];
+long long compositions[MAX_DIGITS];
+long long resultComposition[MAX_DIGITS];
+
+void evaluateCompositions(int n, int i, int maxN, char *strNum) {
+    if (n == 0) {
+        // Copy the successful composition to resultComposition
+        for (int k = 0; k < i; k++) {
+            resultComposition[k] = compositions[k];
+        }
+    } else if (n > 0) {
+        for (int k = 1; k <= maxN; k++) {
+            arr[i] = k;
+            int idx = i > 0 ? compositions[i - 1] : 0;
+            int digit = atoi(strNum + idx);
+            compositions[i] = digit;
+            evaluateCompositions(n - digit, i + 1, maxN, strNum);
         }
     }
-    //CASE 2
-
-    digit_sum += num;
-    return digit_sum;
 }
 
-int check (unsigned long long n) {
-    unsigned long long number = digit_sum(n);
-    if (number * number == n) {
-=======
-int count_digits(long long n){
-    int count;
-    do {
-        n /= 10;
-        ++count;
-    } 
-    while (n != 0);
-    return count;
-}
+int check(int n) {
+    char strNum[MAX_DIGITS];
+    sprintf(strNum, "%d", n);
+    int N = strlen(strNum);
 
-long long digit_separation(long long n,long long percentage,int count) {
-    long long mod;
-    long long sum_d;
-    long long number = n;
+    double sqrtResult = sqrt(n);
+    printf("Checking if %s with square root %.1lf is an S-Number\n", strNum, sqrtResult);
+    int isSNumber = 0;
+    resultComposition[0] = (int)sqrtResult;
 
-    long long tempNumber = number;
+    for (int i = 0; i < N; i++) {
+        arr[i] = 0;
+    }
 
-    while (tempNumber > 0) {
-        mod = tempNumber % 10;
-        tempNumber /= 10; 
-        if ((mod + tempNumber) ^ 2 == n){
-            sum_d += n;
+    evaluateCompositions(N, 0, N, strNum);
+
+    int total = 0;
+    for (int j = 0; j < N; j++) {
+        total += compositions[j];
+    }
+
+    if (total == (int)sqrtResult) {
+        isSNumber = 1;
+    }
+
+    if (isSNumber) {
+        for (int i = 0; i < N; i++) {
+            printf("%lld", resultComposition[i]);
+            if (resultComposition[i + 1] != 0) {
+                printf(" + ");
+            }
         }
+        printf("= %.1lf\n", sqrtResult);
+        printf("%s is an S-Number\n", strNum);
+    } else {
+        printf("%s doesn't look like an S-Number\n", strNum);
     }
-    return sum_d;
-}
 
-int check(long long n){
-    long long num = n;
-    long long perc = 10;
-    
-    if (digit_separation(num,perc,count_digits(n))^2 == n) {
->>>>>>> bc80f9a (upd)
-        return 1;
-    }
-    return 0;
+    return isSNumber;
 }
 
 int main(int argc, char **argv) {
     if (argc != 3) {
+        printf("ERROR: MORE/LESS THAN 2 INPUTS\n");
         return 1;
     }
+
     unsigned long long low = atoll(argv[1]);
     unsigned long long high = atoll(argv[2]);
-    if (low > high || low < min_number || high > max_number){
-        printf("error\n");
+
+    if (low > high || low < MIN_NUMBER || high > MAX_NUMBER) {
+        printf("INPUTS NEED TO MATCH THE LIMITS\n");
         return 1;
     }
+
     unsigned long long begin = sqrt(low);
     if (begin * begin < low) {
-        ++begin; 
+        ++begin;
     }
-    unsigned long long sum = 0;
+    long long sum = 0;
+
     for (unsigned long long i = begin; i * i <= high; i += 2) {
         register unsigned long long sqr = i * i;
         if (check(sqr)) {
             sum += sqr;
         }
     }
-    printf("%lld\n",sum);
+    printf("%lld\n", sum);
     return 0;
 }
