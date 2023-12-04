@@ -10,19 +10,32 @@ int calculateB(int testNumber, int divisor) {
     return testNumber % divisor;
 }
 
-unsigned long long breakdown(unsigned long long number,unsigned long long other_number,int divisor,unsigned long long original) {
+unsigned long long breakdown(unsigned long long number,unsigned long long other_number,int divisor,unsigned long long original,unsigned long long temp) {
     if (number <= 0) {
         return 1;
     }
-    unsigned long long mod;
-    mod = number % divisor;
+    unsigned long long mod = number % divisor;
     number /=  divisor;
     unsigned long long sum = number + mod + other_number;
-    printf("%lld %lld %lld\n",number,mod,other_number);
-    if (sum * sum == original){
+    printf("%lld %lld %lld\n", number,mod,other_number);
+    if (sum * sum == original && mod != 0){
         return sum;
     }
-    return breakdown(number,other_number,divisor,original);
+    int mod_digits = floor(log10(mod)) + 1;
+    unsigned long long mod2;
+    if (mod_digits > 1) {
+        temp = mod;
+        int divisor2 = 10;
+        while (temp > 0) {
+            mod2 = mod % divisor2;
+            temp /= divisor2;
+            sum = number + other_number + mod2 + temp;
+            if (sum * sum == original && mod != 0){
+                return sum;
+            }
+        }
+    }
+    return breakdown(number,other_number,divisor,original,temp);
 }
 
 unsigned long long recursiveNumberSplitting(unsigned long long testNumber) {
@@ -44,7 +57,7 @@ unsigned long long recursiveNumberSplitting(unsigned long long testNumber) {
         }
         for (int i = 1; i <= digits_a; i++) {
             division *= 10;
-            sum1 = breakdown(a,b,division,testNumber);
+            sum1 = breakdown(a,b,division,testNumber,a);
             if (sum1 != 1) {
                 printf("yes sum = %lld\n",sum1);
                 break;
@@ -56,7 +69,7 @@ unsigned long long recursiveNumberSplitting(unsigned long long testNumber) {
         unsigned long long mod2;
         for (int i = 1; i <= digits_b; i++) {
             division *= 10;
-            sum2 = breakdown(b,a,division,testNumber);
+            sum2 = breakdown(b,a,division,testNumber,b);
             if (sum2 * sum2 == testNumber) {
                 printf("yes sum = %lld\n",sum2);
                 break;
