@@ -13,18 +13,33 @@ unsigned long long calculateB(unsigned long long testNumber, unsigned long long 
     return testNumber % divisor;
 }
 
-unsigned long long breakdown(unsigned long long number,unsigned long long other_number,int divisor,unsigned long long original) {
+unsigned long long breakdown(unsigned long long number,unsigned long long other_number,int divisor,unsigned long long original,unsigned long long temp) {
     if (number <= 0) {
         return 1;
     }
-    unsigned long long mod;
-    mod = number % divisor;
+    unsigned long long mod = number % divisor;
     number /=  divisor;
     unsigned long long sum = number + mod + other_number;
-    if (sum * sum == original){
+        printf("%lld %lld %lld\n", number,mod,other_number);
+    if (sum * sum == original && number != 0 && other_number != 0 && mod != 0){
         return sum;
     }
-    return breakdown(number,other_number,divisor,original);
+    int mod_digits = floor(log10(mod)) + 1;
+    unsigned long long mod2;
+    if (mod_digits > 1) {
+        temp = mod;
+        int divisor2 = 10;
+        while (temp > 0) {
+            mod2 = mod % divisor2;
+            temp /= divisor2;
+            sum = number + other_number + mod2 + temp;
+            if (sum * sum == original && number != 0 && other_number != 0 && temp != 0 && mod2 != 0){
+                return sum;
+            }
+            return 0;
+        }
+    }
+    return breakdown(number,other_number,divisor,original,temp);
 }
 
 unsigned long long recursiveNumberSplitting(unsigned long long testNumber) {
@@ -36,27 +51,23 @@ unsigned long long recursiveNumberSplitting(unsigned long long testNumber) {
         unsigned long long b = calculateB(testNumber, divisor);
         unsigned long long a = calculateA(testNumber, divisor);
         int digits_a = floor(log10(a)) + 1;
-        unsigned long long division = 1;
-        unsigned long long mod;
-
         sum1 = a + b;
         if (sum1 * sum1 == testNumber) {
             return sum1;
         }
+        int division = 1;
         for (int i = 1; i <= digits_a; i++) {
             division *= 10;
-            sum1 = breakdown(a,b,division,testNumber);
+            sum1 = breakdown(a,b,division,testNumber,a);
             if (sum1 != 1) {
                 return sum1;
             }
         }
-        unsigned long long temp2 = b;
         int digits_b = floor(log10(b)) + 1;
-        unsigned long long division2 = 1;
-        unsigned long long mod2;
+        int division2 = 1;
         for (int i = 1; i <= digits_b; i++) {
-            division *= 10;
-            sum2 = breakdown(b,a,division,testNumber);
+            division2 *= 10;
+            sum2 = breakdown(b,a,division2,testNumber,b);
             if (sum2 * sum2 == testNumber) {
                 return sum2;
             }
@@ -102,6 +113,6 @@ int main(int argc, char **argv) {
             sum += sqr;
         }
     }
-    
+    printf("%lld\n",sum);
     return 0;
 }
