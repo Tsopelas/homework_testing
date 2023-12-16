@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define INITIAL_CAPACITY 100
 
@@ -23,25 +24,33 @@ int main(int argc, char *argv[]) {
         free(file1Contents);
         return 3;
     }
+
     int size;
-    if (size1 < size2){
+    if (size1 < size2) {
         size = size1;
-    }
-    else{
+    } else {
         size = size2;
     }
-    int consecutive = 0;
-    char *max_comb = (char *)malloc(size * sizeof(char));
-    for (int i = 1; i <= size; i++) {
-        if (file1Contents[i] = file2Contents[i]){
-            consecutive++;
-            max_comb[consecutive] = file1Contents[i];
+
+    int counter = 0;
+    int max = 0;
+    char max_comb[size];
+    for (int i = 1; i < size; i++){
+        if (file1Contents[i] == file2Contents[i]){
+            counter++;
+            char combination[counter];
+            combination[0] = '\0'; // Initialize the string
+            char temp[2] = {file1Contents[i], '\0'};
+            strcat(combination,temp);
+            if (counter > max){
+                max = counter;
+                printf("%s",combination);
+            }
         }
         else{
-            consecutive = 0;
+            counter = 0;
         }
     }
-
     free(file1Contents);
     free(file2Contents);
 
